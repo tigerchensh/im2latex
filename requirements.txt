@@ -8,3 +8,5 @@ logging
 multiprocessing
 six
 click
+matplotlib
+tensorboardX

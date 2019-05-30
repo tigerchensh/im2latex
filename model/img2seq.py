@@ -3,12 +3,10 @@ import numpy as np
 import tensorflow as tf
 import tensorflow.contrib.layers as layers
 
-
 from .utils.general import Config, Progbar, minibatches
 from .utils.image import pad_batch_images
 from .utils.text import pad_batch_formulas
 from .evaluation.text import score_files, write_answers, truncate_end
-
 
 from .encoder import Encoder
 from .decoder import Decoder
@@ -28,44 +26,39 @@ class Img2SeqModel(BaseModel):
         super(Img2SeqModel, self).__init__(config, dir_output)
         self._vocab = vocab
 
-
     def build_train(self, config):
         """Builds model"""
         self.logger.info("Building model...")
 
         self.encoder = Encoder(self._config)
         self.decoder = Decoder(self._config, self._vocab.n_tok,
-                self._vocab.id_end)
+                               self._vocab.id_end)
 
         self._add_placeholders_op()
         self._add_pred_op()
         self._add_loss_op()
 
         self._add_train_op(config.lr_method, self.lr, self.loss,
-                config.clip)
+                           config.clip)
         self.init_session()
         self._add_summary()
 
         self.logger.info("- done.")
-
 
     def build_pred(self):
         self.logger.info("Building model...")
 
         self.encoder = Encoder(self._config)
         self.decoder = Decoder(self._config, self._vocab.n_tok,
-                self._vocab.id_end)
+                               self._vocab.id_end)
 
         self._add_placeholders_op()
         self._add_pred_op()
         self._add_loss_op()
 
         self.init_session()
-        self._add_summary()
 
         self.logger.info("- done.")
-
-
 
     def _add_placeholders_op(self):
         """
@@ -73,24 +66,22 @@ class Img2SeqModel(BaseModel):
         """
         # hyper params
         self.lr = tf.placeholder(tf.float32, shape=(),
-            name='lr')
+                                 name='lr')
         self.dropout = tf.placeholder(tf.float32, shape=(),
-            name='dropout')
+                                      name='dropout')
         self.training = tf.placeholder(tf.bool, shape=(),
-            name="training")
-
+                                       name="training")
 
         # input of the graph
         self.img = tf.placeholder(tf.uint8, shape=(None, None, None, 1),
-            name='img')
+                                  name='img')
         self.formula = tf.placeholder(tf.int32, shape=(None, None),
-            name='formula')
-        self.formula_length = tf.placeholder(tf.int32, shape=(None, ),
-            name='formula_length')
+                                      name='formula')
+        self.formula_length = tf.placeholder(tf.int32, shape=(None,),
+                                             name='formula_length')
 
         # tensorboard
-        tf.summary.scalar("lr", self.lr)
-
+        # tf.summary.scalar("lr", self.lr)
 
     def _get_feed_dict(self, img, training, formula=None, lr=None, dropout=1):
         """Returns a dict"""
@@ -104,7 +95,7 @@ class Img2SeqModel(BaseModel):
 
         if formula is not None:
             formula, formula_length = pad_batch_formulas(formula,
-                    self._vocab.id_pad, self._vocab.id_end)
+                                                         self._vocab.id_pad, self._vocab.id_end)
             # print img.shape, formula.shape
             fd[self.formula] = formula
             fd[self.formula_length] = formula_length
@@ -113,16 +104,14 @@ class Img2SeqModel(BaseModel):
 
         return fd
 
-
     def _add_pred_op(self):
         """Defines self.pred"""
         encoded_img = self.encoder(self.training, self.img, self.dropout)
         train, test = self.decoder(self.training, encoded_img, self.formula,
-                self.dropout)
+                                   self.dropout)
 
         self.pred_train = train
-        self.pred_test  = test
-
+        self.pred_test = test
 
     def _add_loss_op(self):
         """Defines self.loss"""
@@ -136,13 +125,11 @@ class Img2SeqModel(BaseModel):
         self.loss = tf.reduce_mean(losses)
 
         # # to compute perplexity for test
-        self.ce_words = tf.reduce_sum(losses) # sum of CE for each word
-        self.n_words = tf.reduce_sum(self.formula_length) # number of words
+        self.ce_words = tf.reduce_sum(losses)  # sum of CE for each word
+        self.n_words = tf.reduce_sum(self.formula_length)  # number of words
 
         # for tensorboard
-        tf.summary.scalar("loss", self.loss)
-
-
+        # tf.summary.scalar("loss", self.loss)
 
     def _run_epoch(self, config, train_set, val_set, epoch, lr_schedule):
         """Performs an epoch of training
@@ -168,32 +155,41 @@ class Img2SeqModel(BaseModel):
         for i, (img, formula) in enumerate(minibatches(train_set, batch_size)):
             # get feed dict
             fd = self._get_feed_dict(img, training=True, formula=formula,
-                    lr=lr_schedule.lr, dropout=config.dropout)
+                                     lr=lr_schedule.lr, dropout=config.dropout)
 
             # update step
-            summary, _, loss_eval = self.sess.run([self.merged, self.train_op, self.loss],
-                    feed_dict=fd)
+            # summary, _, loss_eval = self.sess.run([self.merged, self.train_op, self.loss],
+            #         feed_dict=fd)
+            _, loss_eval = self.sess.run([self.train_op, self.loss],
+                                         feed_dict=fd)
             prog.update(i + 1, [("loss", loss_eval), ("perplexity",
-                    np.exp(loss_eval)), ("lr", lr_schedule.lr)])
+                                                      np.exp(loss_eval)), ("lr", lr_schedule.lr)])
+
+            step = epoch * nbatches + i
+            # self.tf_logger.add_scalar('loss', {'loss': loss_eval, 'perplexity': np.exp(loss_eval)}, step)
+            self.tf_logger.add_scalars('loss/loss', {'loss': loss_eval}, step)
+            self.tf_logger.add_scalars('loss/perplexity', {'perplexity': np.exp(loss_eval)}, step)
+            self.tf_logger.add_scalars('lr', {'lr': lr_schedule.lr}, step)
 
             # update learning rate
-            lr_schedule.update(batch_no=epoch*nbatches + i)
+            lr_schedule.update(batch_no=epoch * nbatches + i)
 
-            self.file_writer.add_summary(summary, epoch*nbatches + i)
+            # self.file_writer.add_summary(summary, epoch*nbatches + i)
 
         # logging
         self.logger.info("- Training: {}".format(prog.info))
 
         # evaluation
         config_eval = Config({"dir_answers": self._dir_output + "formulas_val/",
-                "batch_size": config.batch_size})
+                              "batch_size": config.batch_size})
         scores = self.evaluate(config_eval, val_set)
+
         score = scores[config.metric_val]
         lr_schedule.update(score=score)
 
+        self.tf_logger.add_scalars('loss/score', scores, epoch * nbatches)
+
         return score
-
-
 
     def write_prediction(self, config, test_set):
         """Performs an epoch of evaluation
@@ -214,13 +210,13 @@ class Img2SeqModel(BaseModel):
             refs, hyps = [], [[] for i in range(self._config.beam_size)]
 
         # iterate over the dataset
-        n_words, ce_words = 0, 0 # sum of ce for all words + nb of words
+        n_words, ce_words = 0, 0  # sum of ce for all words + nb of words
         for img, formula in minibatches(test_set, config.batch_size):
             fd = self._get_feed_dict(img, training=False, formula=formula,
-                    dropout=1)
+                                     dropout=1)
             ce_words_eval, n_words_eval, ids_eval = self.sess.run(
-                    [self.ce_words, self.n_words, self.pred_test.ids],
-                    feed_dict=fd)
+                [self.ce_words, self.n_words, self.pred_test.ids],
+                feed_dict=fd)
 
             # TODO(guillaume): move this logic into tf graph
             if self._config.decoding == "greedy":
@@ -237,12 +233,11 @@ class Img2SeqModel(BaseModel):
                     hyps[i].append(pred)
 
         files = write_answers(refs, hyps, self._vocab.id_to_tok,
-                config.dir_answers, self._vocab.id_end)
+                              config.dir_answers, self._vocab.id_end)
 
         perp = - np.exp(ce_words / float(n_words))
 
         return files, perp
-
 
     def _run_evaluate(self, config, test_set):
         """Performs an epoch of evaluation
@@ -261,7 +256,6 @@ class Img2SeqModel(BaseModel):
         scores["perplexity"] = perp
 
         return scores
-
 
     def predict_batch(self, images):
         if self._config.decoding == "greedy":
@@ -285,7 +279,6 @@ class Img2SeqModel(BaseModel):
                 hyps[i].append(p)
 
         return hyps
-
 
     def predict(self, img):
         preds = self.predict_batch([img])

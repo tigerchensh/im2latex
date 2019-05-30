@@ -3,8 +3,9 @@ import os
 import sys
 import time
 import tensorflow as tf
+from tensorboardX import SummaryWriter
 
-
+from tools.tensorboard_logging import Logger
 from .utils.general import init_dir, get_logger
 
 
@@ -123,13 +124,14 @@ class BaseModel(object):
     def _add_summary(self):
         """Defines variables for Tensorboard
 
-        Args:
+        Args
             dir_output: (string) where the results are written
 
         """
         self.merged = tf.summary.merge_all()
         log_path = os.path.join(self._dir_output, 'runs')
         log_path = os.path.join(log_path, datetime.now().strftime("%m%d%H%M%S"))
+        self.tf_logger = SummaryWriter(logdir=log_path)
         self.file_writer = tf.summary.FileWriter(log_path, self.sess.graph)
 
 

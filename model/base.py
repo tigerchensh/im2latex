@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 import sys
 import time
@@ -126,9 +127,10 @@ class BaseModel(object):
             dir_output: (string) where the results are written
 
         """
-        self.merged      = tf.summary.merge_all()
-        self.file_writer = tf.summary.FileWriter(self._dir_output,
-                self.sess.graph)
+        self.merged = tf.summary.merge_all()
+        log_path = os.path.join(self._dir_output, 'runs')
+        log_path = os.path.join(log_path, datetime.now().strftime("%m%d%H%M%S"))
+        self.file_writer = tf.summary.FileWriter(log_path, self.sess.graph)
 
 
     def train(self, config, train_set, val_set, lr_schedule):

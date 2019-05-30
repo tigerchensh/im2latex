@@ -44,6 +44,7 @@ class Img2SeqModel(BaseModel):
         self._add_train_op(config.lr_method, self.lr, self.loss,
                 config.clip)
         self.init_session()
+        self._add_summary()
 
         self.logger.info("- done.")
 
@@ -60,6 +61,7 @@ class Img2SeqModel(BaseModel):
         self._add_loss_op()
 
         self.init_session()
+        self._add_summary()
 
         self.logger.info("- done.")
 
@@ -169,13 +171,15 @@ class Img2SeqModel(BaseModel):
                     lr=lr_schedule.lr, dropout=config.dropout)
 
             # update step
-            _, loss_eval = self.sess.run([self.train_op, self.loss],
+            summary, _, loss_eval = self.sess.run([self.merged, self.train_op, self.loss],
                     feed_dict=fd)
             prog.update(i + 1, [("loss", loss_eval), ("perplexity",
                     np.exp(loss_eval)), ("lr", lr_schedule.lr)])
 
             # update learning rate
             lr_schedule.update(batch_no=epoch*nbatches + i)
+
+            self.file_writer.add_summary(summary, epoch*nbatches + i)
 
         # logging
         self.logger.info("- Training: {}".format(prog.info))

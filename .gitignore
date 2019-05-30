@@ -10,3 +10,5 @@ tmp/
 *.log
 *.sh
 Image*
+.idea/
+.python-version

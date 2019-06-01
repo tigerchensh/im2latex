@@ -5,7 +5,7 @@ import nltk
 import distance
 
 
-from ..utils.text import load_formulas
+from ..utils.text import load_formulas, split_formula
 from ..utils.general import init_dir
 
 
@@ -26,9 +26,10 @@ def score_files(path_ref, path_hyp):
 
     assert len(formulas_ref) == len(formulas_hyp)
 
+    # TODO
     # tokenize
-    refs = [ref.split(' ') for _, ref in formulas_ref.items()]
-    hyps = [hyp.split(' ') for _, hyp in formulas_hyp.items()]
+    refs = [split_formula(ref) for _, ref in formulas_ref.items()]
+    hyps = [split_formula(hyp) for _, hyp in formulas_hyp.items()]
 
     # score
     return {

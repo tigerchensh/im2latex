@@ -8,7 +8,6 @@ class Vocab(object):
         self.config = config
         self.load_vocab()
 
-
     def load_vocab(self):
         special_tokens = [self.config.unk, self.config.pad, self.config.end]
         self.tok_to_id = load_tok_to_id(self.config.path_vocab, special_tokens)
@@ -18,7 +17,6 @@ class Vocab(object):
         self.id_pad = self.tok_to_id[self.config.pad]
         self.id_end = self.tok_to_id[self.config.end]
         self.id_unk = self.tok_to_id[self.config.unk]
-
 
     @property
     def form_prepro(self):
@@ -35,11 +33,12 @@ def get_form_prepro(vocab, id_unk):
         lambda function(formula) -> list of ids
 
     """
+
     def get_token_id(token):
         return vocab[token] if token in vocab else id_unk
 
     def f(formula):
-        formula = formula.strip().split(' ')
+        formula = split_formula(formula)
         return map(lambda t: get_token_id(t), formula)
 
     return f
@@ -107,13 +106,14 @@ def write_vocab(vocab, filename):
 
     """
     print("Writing vocab...")
+    i = 0
     with open(filename, "w") as f:
         for i, word in enumerate(vocab):
             if i != len(vocab) - 1:
                 f.write("{}\n".format(word))
             else:
                 f.write(word)
-    print("- done. {} tokens".format(i+1))
+    print("- done. {} tokens".format(i + 1))
 
 
 def pad_batch_formulas(formulas, id_pad, id_end, max_len=None):
@@ -132,13 +132,13 @@ def pad_batch_formulas(formulas, id_pad, id_end, max_len=None):
     if max_len is None:
         max_len = max(map(lambda x: len(x), formulas))
 
-    batch_formulas = id_pad * np.ones([len(formulas), max_len+1],
-            dtype=np.int32)
+    batch_formulas = id_pad * np.ones([len(formulas), max_len + 1],
+                                      dtype=np.int32)
     formula_length = np.zeros(len(formulas), dtype=np.int32)
     for idx, formula in enumerate(formulas):
         batch_formulas[idx, :len(formula)] = np.asarray(formula,
-                dtype=np.int32)
-        batch_formulas[idx, len(formula)]  = id_end
+                                                        dtype=np.int32)
+        batch_formulas[idx, len(formula)] = id_end
         formula_length[idx] = len(formula) + 1
 
     return batch_formulas, formula_length
@@ -152,3 +152,14 @@ def load_formulas(filename):
 
     print("Loaded {} formulas from {}".format(len(formulas), filename))
     return formulas
+
+
+def split_formula(formula):
+    ret = []
+    tokens = formula.strip().split(' ')
+    for t in tokens:
+        if t.isdigit():
+            ret.extend(list(t))
+        else:
+            ret.append(t)
+    return ret

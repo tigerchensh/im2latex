@@ -4,7 +4,7 @@ import numpy as np
 from scipy.misc import imread
 
 
-from .text import load_formulas
+from .text import load_formulas, split_formula
 from .image import build_images, greyscale
 from .general import init_dir
 
@@ -37,7 +37,7 @@ class DataGenerator(object):
     """Data Generator of tuple (image, formula)"""
 
     def __init__(self, path_formulas, dir_images, path_matching, bucket=False,
-                form_prepro=lambda s: s.strip().split(' '), iter_mode="data",
+                form_prepro=lambda s: split_formula(s), iter_mode="data",
                 img_prepro=lambda x: x, max_iter=None, max_len=None,
                 bucket_size=20):
         """Initializes the DataGenerator
@@ -224,7 +224,7 @@ class DataGenerator(object):
 
 
     def build(self, quality=100, density=200, down_ratio=2, buckets=None,
-                n_threads=4):
+                n_threads=12):
         """Generates images from the formulas and writes the correspondance
         in the matching file.
 

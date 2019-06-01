@@ -36,7 +36,8 @@ def minibatches(data_generator, minibatch_size):
 
 def run(cmd, timeout_sec):
     """Run cmd in the shell with timeout"""
-    proc = subprocess.Popen(cmd, shell=True)
+    FNULL = open(os.devnull, 'w')
+    proc = subprocess.Popen(cmd, shell=True, stdout=FNULL)
     kill_proc = lambda p: p.kill()
     timer = Timer(timeout_sec, kill_proc, [proc])
     try:

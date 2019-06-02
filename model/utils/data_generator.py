@@ -225,7 +225,7 @@ class DataGenerator(object):
 
     def build(self, quality=100, density=200, down_ratio=2, buckets=None,
                 n_threads=12):
-        """Generates images from the formulas and writes the correspondance
+        """Generates images from the formulas and writes the correspondence
         in the matching file.
 
         Args:

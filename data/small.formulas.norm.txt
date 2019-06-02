@@ -1,10 +1,6 @@
 \alpha + \beta
 \frac { 1 } { 2 }
-\frac { \alpha } { \beta }
-1 + 2
-\alpha + \beta
-\frac { 1 } { 2 }
-\frac { \alpha } { \beta }
-1 + 2
-\alpha + \beta
-\frac { 1 } { 2 }
+123
+21
+1244123
+1231

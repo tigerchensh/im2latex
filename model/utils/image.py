@@ -80,7 +80,9 @@ def pad_image(img, output_path, pad_size=[8,8,8,8], buckets=None):
     new_size = get_new_size(old_size, buckets)
     new_im = Image.new("RGB", new_size, (255,255,255))
     new_im.paste(old_im, (left, top))
+    new_im = new_im.resize((80, 60), Image.BILINEAR)
     new_im.save(output_path)
+    return new_im
 
 
 def get_new_size(old_size, buckets):
@@ -165,13 +167,17 @@ def convert_to_png(formula, dir_output, name, quality=100, density=200,
     \end{document}""" % (formula))
 
     # call pdflatex to create pdf
-    run("pdflatex -interaction=nonstopmode -output-directory={} {}".format(
-        dir_output, dir_output+"{}.tex".format(name)), TIMEOUT)
+    cmd = "pdflatex -interaction=nonstopmode -output-directory={} {}".format(
+        dir_output, dir_output + "{}.tex".format(name))
+    print cmd
+    run(cmd, TIMEOUT)
 
     # call magick to convert the pdf into a png file
-    run("magick convert -density {} -quality {} {} {}".format(density, quality,
-        dir_output+"{}.pdf".format(name), dir_output+"{}.png".format(name)),
-        TIMEOUT)
+    cmd = "magick convert -density {} -quality {} {} {}".format(density, quality,
+                                                                dir_output + "{}.pdf".format(name),
+                                                                dir_output + "{}.png".format(name))
+    print cmd
+    run(cmd, TIMEOUT)
 
     # cropping and downsampling
     img_path = dir_output + "{}.png".format(name)
@@ -179,7 +185,7 @@ def convert_to_png(formula, dir_output, name, quality=100, density=200,
     try:
         crop_image(img_path, img_path)
         pad_image(img_path, img_path, buckets=buckets)
-        downsample_image(img_path, img_path, down_ratio)
+        # downsample_image(img_path, img_path, down_ratio)
         clean(dir_output, name)
 
         return "{}.png".format(name)

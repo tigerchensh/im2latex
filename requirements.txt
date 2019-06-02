@@ -10,3 +10,4 @@ six
 click
 matplotlib
 tensorboardX
+imgaug

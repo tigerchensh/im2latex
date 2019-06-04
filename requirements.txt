@@ -11,3 +11,4 @@ click
 matplotlib
 tensorboardX
 imgaug
+pathlib

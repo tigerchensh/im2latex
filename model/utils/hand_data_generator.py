@@ -189,6 +189,6 @@ class DataGenerator(object):
                 formulas.append((formula, img_path))
         with open(self._path_formulas, 'w') as formula_file, open(self._path_matching, 'w') as matching_file:
             for idx, (formula, img_path) in enumerate(formulas):
-                self._formulas.append(formula)
+                self._formulas[idx] = formula
                 formula_file.write('{}\n'.format(formula))
                 matching_file.write('{} {}\n'.format(img_path, idx))

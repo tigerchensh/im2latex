@@ -47,6 +47,12 @@ def main(data, vocab, training, model, output):
     # Define learning rate schedule
     n_batches_epoch = ((len(train_set) + config.batch_size - 1) //
                        config.batch_size)
+
+    print len(train_set)
+    print config.batch_size
+    print n_batches_epoch
+    print config
+
     lr_schedule = LRSchedule(lr_init=config.lr_init,
                              start_decay=config.start_decay * n_batches_epoch,
                              end_decay=config.end_decay * n_batches_epoch,

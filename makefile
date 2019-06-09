@@ -52,7 +52,7 @@ eval:
 full: build train eval
 
 build-hand:
-	python build_handwritten.py --data=configs/data_hand.json --vocab=configs/vocab_hand.json
+	python build_hand.py --data=configs/data_hand.json --vocab=configs/vocab_hand.json
 
 train-hand:
-	python train.py --data=configs/data_hand.json --vocab=configs/vocab_hand.json --training=configs/training_hand.json --model=configs/model.json --output=results/hand/
+	python train_hand.py --data=configs/data_hand.json --vocab=configs/vocab_hand.json --training=configs/training_hand.json --model=configs/model.json --output=results/hand/

@@ -50,3 +50,9 @@ eval:
 	python evaluate_img.py --results=results/full/
 
 full: build train eval
+
+build-hand:
+	python build_handwritten.py --data=configs/data_hand.json --vocab=configs/vocab_hand.json
+
+train-hand:
+	python train.py --data=configs/data_hand.json --vocab=configs/vocab_hand.json --training=configs/training_hand.json --model=configs/model.json --output=results/hand/

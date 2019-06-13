@@ -8,8 +8,8 @@
     "index_file"  : "/home/xiao/data/ocr_data/android_collected/index.txt",
 
     "path_matching_train": "data/hand.train.matching.txt",
-    "path_matching_val"  : "data/hand.test.matching.txt",
-    "path_matching_test" : "data/hand.val.matching.txt",
+    "path_matching_test"  : "data/hand.test.matching.txt",
+    "path_matching_val" : "data/hand.val.matching.txt",
 
     "path_formulas_train": "data/hand.train.formulas.norm.txt",
     "path_formulas_test" : "data/hand.test.formulas.norm.txt",
@@ -21,7 +21,7 @@
     "bucket_test": true,
 
     "max_iter"          : null,
-    "max_length_formula": 10,
+    "max_length_formula": 50,
 
     "buckets": []
 }

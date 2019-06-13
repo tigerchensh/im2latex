@@ -152,11 +152,11 @@ class Img2SeqModel(BaseModel):
         # iterate over dataset
         for i, (img, formula) in enumerate(minibatches(train_set, batch_size)):
             seq = iaa.Sequential([
-                iaa.Invert(p=1),
-                iaa.Affine(rotate=(-5, 5), scale=(0.5, 1.1)),
-                iaa.ElasticTransformation(alpha=10.0, sigma=5.0),
-                # iaa.SaltAndPepper(p=0.2),
-                iaa.Invert(p=1),
+                # iaa.Invert(p=1),
+                # iaa.Affine(rotate=(-5, 5), scale=(0.5, 1.1)),
+                # iaa.ElasticTransformation(alpha=10.0, sigma=5.0),
+                # # iaa.SaltAndPepper(p=0.2),
+                # iaa.Invert(p=1),
             ])
             # seq.show_grid(img, cols=1, rows=1)
             images_aug = seq.augment_images(img)

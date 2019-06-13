@@ -80,7 +80,7 @@ class DataGenerator(object):
             dict: dict[idx] = one formula
 
         """
-        formulas = []
+        formulas = {}
         if os.path.isfile(filename):
             formulas = load_formulas(filename)
         return formulas

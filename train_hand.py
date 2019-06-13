@@ -1,11 +1,10 @@
 import click
 
-from model.utils.hand_data_generator import DataGenerator
 from model.img2seq import Img2SeqModel
-from model.utils.lr_schedule import LRSchedule
 from model.utils.general import Config
+from model.utils.hand_data_generator import DataGenerator
+from model.utils.lr_schedule import LRSchedule
 from model.utils.text import Vocab
-from model.utils.image import greyscale
 
 
 @click.command()

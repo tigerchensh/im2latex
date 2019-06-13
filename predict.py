@@ -35,7 +35,8 @@ input> data/images_test/0.png""")
 
         if img_path[-3:] == "png":
             img = Image.open(img_path)
-            img = img.resize((80, 60), Image.BILINEAR)
+            img = img.resize((80, 100), Image.BILINEAR)
+            img.show()
             img = numpy.array(img)
 
             # crop_image(img_path, tmp_img)
@@ -72,7 +73,7 @@ input> data/images_test/0.png""")
 if __name__ == "__main__":
     # restore config and model
     # dir_output = "results/small/"
-    dir_output = "results/full/"
+    dir_output = "results/hand/"
     config_vocab = Config(dir_output + "vocab.json")
     config_model = Config(dir_output + "model.json")
     vocab = Vocab(config_vocab)

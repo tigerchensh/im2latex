@@ -27,7 +27,7 @@ def main(data, vocab, training, model, output):
 
     # Load datasets
     train_set = DataGenerator(
-        index_file=config.index_file,
+        index_file=config.index_train,
         path_formulas=config.path_formulas_train,
         dir_images=config.dir_images_train,
         max_iter=config.max_iter,
@@ -35,7 +35,7 @@ def main(data, vocab, training, model, output):
         max_len=config.max_length_formula,
         form_prepro=vocab.form_prepro)
     val_set = DataGenerator(
-        index_file=config.index_file,
+        index_file=config.index_val,
         path_formulas=config.path_formulas_val,
         dir_images=config.dir_images_val,
         max_iter=config.max_iter,

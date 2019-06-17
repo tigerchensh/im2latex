@@ -15,17 +15,17 @@ def main(data, vocab):
 
     # datasets
     train_set = DataGenerator(
-        index_file=data_config.index_file,
+        index_file=data_config.index_train,
         path_formulas=data_config.path_formulas_train,
         dir_images=data_config.dir_images_train,
         path_matching=data_config.path_matching_train)
     test_set = DataGenerator(
-        index_file=data_config.index_file,
+        index_file=data_config.index_test,
         path_formulas=data_config.path_formulas_test,
         dir_images=data_config.dir_images_train,
         path_matching=data_config.path_matching_test)
     val_set = DataGenerator(
-        index_file=data_config.index_file,
+        index_file=data_config.index_val,
         path_formulas=data_config.path_formulas_val,
         dir_images=data_config.dir_images_train,
         path_matching=data_config.path_matching_val)

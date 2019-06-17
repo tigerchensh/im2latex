@@ -1,11 +1,13 @@
 {
     "export_name": "data.json",
 
-    "dir_images_train": "/home/xiao/data/ocr_data/android_collected",
-    "dir_images_test" : "/home/xiao/data/ocr_data/android_collected",
-    "dir_images_val"  : "/home/xiao/data/ocr_data/android_collected",
+    "dir_images_train": "/home/gaoxiao/code/im2latex/tools/data/hand",
+    "dir_images_test" : "/home/gaoxiao/code/im2latex/tools/data/hand",
+    "dir_images_val"  : "/home/gaoxiao/code/im2latex/tools/data/hand",
 
-    "index_file"  : "/home/xiao/data/ocr_data/android_collected/index.txt",
+    "index_train"  : "index_train.txt",
+    "index_test"  : "index_test.txt",
+    "index_val"  : "index_val.txt",
 
     "path_matching_train": "data/hand.train.matching.txt",
     "path_matching_test"  : "data/hand.test.matching.txt",

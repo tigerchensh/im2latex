@@ -55,7 +55,7 @@ class DataGenerator(object):
             bucket_size: (int)
 
         """
-        self._index_file = index_file
+        self._index_file = os.path.join(dir_images, index_file)
         self._path_formulas = path_formulas
         self._dir_images = dir_images
         self._path_matching = path_matching

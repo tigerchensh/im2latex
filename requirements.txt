@@ -12,3 +12,6 @@ matplotlib
 tensorboardX
 imgaug
 pathlib
+pymongo
+tqdm
+requests

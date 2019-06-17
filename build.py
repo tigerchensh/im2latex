@@ -1,10 +1,8 @@
-import Augmentor as Augmentor
 import click
 
 from model.utils.data_generator import DataGenerator
-from model.utils.text import build_vocab, write_vocab
-from model.utils.image import build_images
 from model.utils.general import Config
+from model.utils.text import build_vocab, write_vocab
 
 
 @click.command()

@@ -38,6 +38,10 @@ class DataGenerator(object):
                  img_prepro=lambda x: x, max_iter=None, max_len=None):
         """Initializes the DataGenerator
 
+        Raw images should be under dir_images/raw
+        Index file should be under dir_images
+        Small train file will be generated under dir_images/small
+
         Args:
             path_formulas: (string) file of formulas.
             dir_images: (string) dir of images, contains jpg files.
@@ -57,13 +61,17 @@ class DataGenerator(object):
         """
         self._index_file = os.path.join(dir_images, index_file)
         self._path_formulas = path_formulas
-        self._dir_images = dir_images
         self._path_matching = path_matching
         self._img_prepro = img_prepro
         self._form_prepro = form_prepro
         self._max_iter = max_iter
         self._max_len = max_len
         self._iter_mode = iter_mode
+
+        self._raw_dir_images = os.path.join(dir_images, 'raw')
+        self._dir_images = os.path.join(dir_images, 'small')
+        if not os.path.exists(self._dir_images):
+            os.mkdir(self._dir_images)
 
         self._length = None
         self._formulas = self._load_formulas(path_formulas)
@@ -117,9 +125,9 @@ class DataGenerator(object):
         """
         img_path, formula_id = example
 
-        raw_img = Image.open(os.path.join(self._dir_images, img_path)).convert('L')
-        raw_img = raw_img.resize((80, 100), Image.BILINEAR)
-
+        # raw_img = Image.open(os.path.join(self._dir_images, img_path)).convert('L')
+        # raw_img = raw_img.resize((80, 100), Image.BILINEAR)
+        raw_img = Image.open(os.path.join(self._dir_images, img_path))
         img = np.array(raw_img)
         img = np.expand_dims(img, axis=2)
 
@@ -184,8 +192,13 @@ class DataGenerator(object):
                 img_path, formula = l.split(',')
                 formula = ' '.join(list(formula))
                 # check img path
-                if not os.path.isfile(os.path.join(self._dir_images, img_path)):
+                if not os.path.isfile(os.path.join(self._raw_dir_images, img_path)):
                     continue
+
+                raw_img = Image.open(os.path.join(self._raw_dir_images, img_path)).convert('L')
+                raw_img = raw_img.resize((80, 100), Image.BILINEAR)
+                raw_img.save(os.path.join(self._dir_images, img_path))
+
                 formulas.append((formula, img_path))
         with open(self._path_formulas, 'w') as formula_file, open(self._path_matching, 'w') as matching_file:
             for idx, (formula, img_path) in enumerate(formulas):

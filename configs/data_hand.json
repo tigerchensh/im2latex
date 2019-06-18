@@ -1,9 +1,9 @@
 {
     "export_name": "data.json",
 
-    "dir_images_train": "/home/gaoxiao/code/im2latex/tools/data/hand",
-    "dir_images_test" : "/home/gaoxiao/code/im2latex/tools/data/hand",
-    "dir_images_val"  : "/home/gaoxiao/code/im2latex/tools/data/hand",
+    "dir_images_train": "tools/data/hand",
+    "dir_images_test" : "tools/data/hand",
+    "dir_images_val"  : "tools/data/hand",
 
     "index_train"  : "index_train.txt",
     "index_test"  : "index_test.txt",

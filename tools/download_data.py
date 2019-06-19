@@ -10,8 +10,9 @@ db = client.littlelights
 images = db.image
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
-DOWNLOAD_DIR = os.path.join(DIR_PATH, 'data/hand')
-INDEX_FILE = os.path.join(DOWNLOAD_DIR, 'index.txt')
+DIR_PATH = os.path.join(DIR_PATH, 'data/hand/')
+DOWNLOAD_DIR = os.path.join(DIR_PATH, 'raw')
+INDEX_FILE = os.path.join(DIR_PATH, 'index.txt')
 
 
 def download(url, file_path):

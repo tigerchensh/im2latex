@@ -1,6 +1,6 @@
 import click
 
-from model.img2seq import Img2SeqModel
+from model.img2seq_hand import Img2SeqModel
 from model.utils.general import Config
 from model.utils.hand_data_generator import DataGenerator
 from model.utils.lr_schedule import LRSchedule

@@ -1,16 +1,17 @@
 import imgaug.augmenters as iaa
 import numpy as np
 import tensorflow as tf
+from tensorflow.python.saved_model import tag_constants
 
 from .base import BaseModel
-from .decoder import Decoder
+from .tflite_decoder import Decoder
 from .encoder import Encoder
 from .evaluation.text import score_files, write_answers, truncate_end
 from .utils.general import Config, Progbar, minibatches
 from .utils.image import pad_batch_images
 from .utils.text import pad_batch_formulas
 
-
+# Need to run with env var: `TF_ENABLE_CONTROL_FLOW_V2=1 make train-hand`
 class Img2SeqModel(BaseModel):
     """Specialized class for Img2Seq Model"""
 
@@ -71,9 +72,10 @@ class Img2SeqModel(BaseModel):
                                        name="training")
 
         # input of the graph
-        self.img = tf.placeholder(tf.uint8, shape=(None, 100, 80, 1),
+        self.img = tf.placeholder(tf.int32, shape=(None, 100, 80, 1),
                                   name='img')
-        self.formula = tf.placeholder(tf.int32, shape=(None, 10),
+        # TODO(gaoxiao): use config to set shape
+        self.formula = tf.placeholder(tf.int32, shape=(None, 15),
                                       name='formula')
         self.formula_length = tf.placeholder(tf.int32, shape=(None,),
                                              name='formula_length')
@@ -91,9 +93,10 @@ class Img2SeqModel(BaseModel):
             self.training: training,
         }
 
+        # TODO(gaoxiao): use config to set max len.
         if formula is not None:
             formula, formula_length = pad_batch_formulas(formula,
-                                                         self._vocab.id_pad, self._vocab.id_end, max_len=9)
+                                                         self._vocab.id_pad, self._vocab.id_end, max_len=14)
             # print img.shape, formula.shape
             fd[self.formula] = formula
             fd[self.formula_length] = formula_length
@@ -108,6 +111,8 @@ class Img2SeqModel(BaseModel):
         train, test = self.decoder(self.training, encoded_img, self.formula,
                                    self.dropout)
 
+        # need to transpose here because 'tf lite lstm' requires 'time_major=True'
+        train = tf.transpose(train, [1, 0, 2])
         self.pred_train = train
         self.pred_test = test
 
@@ -311,4 +316,8 @@ class Img2SeqModel(BaseModel):
         tf.saved_model.simple_save(self.sess,
                                    dir_model,
                                    inputs={"formula": self.formula, "img": self.img},
+                                   # inputs={"formula": self.formula},
                                    outputs={"pred_train": self.pred_train})
+
+    def load_savedmodel(self, dir_model):
+        tf.saved_model.loader.load(self.sess, [tag_constants.SERVING], dir_model)

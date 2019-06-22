@@ -15,18 +15,22 @@ from model.utils.text import Vocab
 def main(results):
     # restore config and model
     dir_output = results
+    weights_dir = os.path.join(dir_output, 'model.weights/')
     saved_path = os.path.join(dir_output, 'saved')
 
     config_data = Config(dir_output + "data.json")
     config_vocab = Config(dir_output + "vocab.json")
     config_model = Config(dir_output + "model.json")
-
     vocab = Vocab(config_vocab)
-    model = Img2SeqModel(config_model, dir_output, vocab)
-    model.build_pred()
-    model.restore_session(dir_output + "model.weights/")
 
-    model.save_savedmodel(saved_path)
+    if not os.path.isdir(saved_path):
+        model = Img2SeqModel(config_model, dir_output, vocab)
+        model.build_pred()
+        model.restore_session(weights_dir)
+
+        model.save_savedmodel(saved_path)
+
+    # chkp.print_tensors_in_checkpoint_file(weights_dir, tensor_name='', all_tensors=True)
 
     converter = tf.lite.TFLiteConverter.from_saved_model(saved_path)
     tflite_model = converter.convert()

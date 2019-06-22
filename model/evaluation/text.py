@@ -54,6 +54,8 @@ def exact_match_score(references, hypotheses):
     for ref, hypo in zip(references, hypotheses):
         if np.array_equal(ref, hypo):
             exact_match += 1
+        # else:
+        #     print 'Found diff, ref:{}, hypo:{}'.format(ref, hypo)
 
     return exact_match / float(max(len(hypotheses), 1))
 

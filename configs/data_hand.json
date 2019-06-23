@@ -23,7 +23,7 @@
     "bucket_test": true,
 
     "max_iter"          : null,
-    "max_length_formula": 50,
+    "max_length_formula": 9,
 
     "buckets": []
 }

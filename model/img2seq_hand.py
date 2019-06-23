@@ -24,6 +24,7 @@ class Img2SeqModel(BaseModel):
         """
         super(Img2SeqModel, self).__init__(config, dir_output)
         self._vocab = vocab
+        self._config = config
 
     def build_train(self, config):
         """Builds model"""
@@ -75,7 +76,7 @@ class Img2SeqModel(BaseModel):
         self.img = tf.placeholder(tf.int32, shape=(None, 100, 80, 1),
                                   name='img')
         # TODO(gaoxiao): use config to set shape
-        self.formula = tf.placeholder(tf.int32, shape=(None, 15),
+        self.formula = tf.placeholder(tf.int32, shape=(None, self._config.max_length_formula + 1),
                                       name='formula')
         self.formula_length = tf.placeholder(tf.int32, shape=(None,),
                                              name='formula_length')
@@ -96,7 +97,8 @@ class Img2SeqModel(BaseModel):
         # TODO(gaoxiao): use config to set max len.
         if formula is not None:
             formula, formula_length = pad_batch_formulas(formula,
-                                                         self._vocab.id_pad, self._vocab.id_end, max_len=14)
+                                                         self._vocab.id_pad, self._vocab.id_end,
+                                                         max_len=self._config.max_length_formula)
             # print img.shape, formula.shape
             fd[self.formula] = formula
             fd[self.formula_length] = formula_length
@@ -110,10 +112,6 @@ class Img2SeqModel(BaseModel):
         encoded_img = self.encoder(self.training, self.img, self.dropout)
         train, test = self.decoder(self.training, encoded_img, self.formula,
                                    self.dropout)
-
-        # need to transpose here because 'tf lite lstm' requires 'time_major=True'
-        train = tf.transpose(train, [1, 0, 2])
-        # test = tf.transpose(test, [1, 0, 2])
 
         self.pred_train = train
         self.pred_test = test

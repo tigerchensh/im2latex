@@ -45,16 +45,11 @@ def interactive_shell(sess):
             # img = imread(tmp_img)
 
         img = greyscale(img)
-        ids_eval, = sess.run(['attn_cell_1/transpose_1:0'], feed_dict={'img:0': [img], 'dropout:0': 1})
-        ids_eval = np.transpose(ids_eval, [0, 2, 1])
-        hyps = [[] for i in range(5)]
-        for preds in ids_eval:
-            for i, pred in enumerate(preds):
-                p = truncate_end(pred, vocab.id_end)
-                p = " ".join([vocab.id_to_tok[idx] for idx in p])
-                hyps[i].append(p)
+        ids_eval, = sess.run(['transpose_1:0'], feed_dict={'img:0': [img], 'dropout:0': 1})
+        p = truncate_end(ids_eval[0], vocab.id_end)
+        p = " ".join([vocab.id_to_tok[idx] for idx in p])
 
-        print hyps[0]
+        print p
 
 
 if __name__ == "__main__":
@@ -66,7 +61,7 @@ if __name__ == "__main__":
     vocab = Vocab(config_vocab)
 
     with tf.Session(graph=tf.Graph()) as sess:
-        tf.saved_model.loader.load(sess, ["serve"], "/home/xiao/code/im2latex/results/hand/saved_2019-06-22-21-32-35")
+        tf.saved_model.loader.load(sess, ["serve"], "results/hand/saved2019-06-23-16-24-51")
         graph = tf.get_default_graph()
 
         # sess.run('myOutput:0', feed_dict={'myInput:0': None})

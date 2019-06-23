@@ -113,6 +113,8 @@ class Img2SeqModel(BaseModel):
 
         # need to transpose here because 'tf lite lstm' requires 'time_major=True'
         train = tf.transpose(train, [1, 0, 2])
+        # test = tf.transpose(test, [1, 0, 2])
+
         self.pred_train = train
         self.pred_test = test
 
@@ -229,7 +231,7 @@ class Img2SeqModel(BaseModel):
             fd = self._get_feed_dict(img, training=False, formula=formula,
                                      dropout=1)
             ce_words_eval, n_words_eval, ids_eval = self.sess.run(
-                [self.ce_words, self.n_words, self.pred_test.ids],
+                [self.ce_words, self.n_words, self.pred_test],
                 feed_dict=fd)
 
             # TODO(guillaume): move this logic into tf graph
@@ -278,7 +280,7 @@ class Img2SeqModel(BaseModel):
             hyps = [[] for i in range(self._config.beam_size)]
 
         fd = self._get_feed_dict(images, training=False, dropout=1)
-        ids_eval, = self.sess.run([self.pred_test.ids], feed_dict=fd)
+        ids_eval, = self.sess.run([self.pred_test], feed_dict=fd)
 
         if self._config.decoding == "greedy":
             ids_eval = np.expand_dims(ids_eval, axis=1)
@@ -314,9 +316,9 @@ class Img2SeqModel(BaseModel):
         self.logger.info("Saving to saved model...")
         tf.saved_model.simple_save(self.sess,
                                    dir_model,
-                                   inputs={"img": self.img, "dropout": self.dropout},
-                                   # inputs={"formula": self.formula},
-                                   outputs={"pred_test": self.pred_test.ids})
+                                   inputs={"img": self.img},
+                                   # inputs={"img": self.img, "dropout": self.dropout},
+                                   outputs={"pred_test": self.pred_test})
 
     def load_savedmodel(self, dir_model):
         tf.saved_model.loader.load(self.sess, [tag_constants.SERVING], dir_model)

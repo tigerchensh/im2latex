@@ -19,7 +19,9 @@ def main(results):
     weights_dir = os.path.join(dir_output, 'model.weights/')
 
     t = datetime.datetime.today().strftime('%Y-%m-%d-%H-%M-%S')
-    saved_path = os.path.join(dir_output, 'saved_' + t)
+    # saved_path = 'saved_' + t
+    saved_path = 'saved' + t
+    saved_path = os.path.join(dir_output, saved_path)
 
     config_data = Config(dir_output + "data.json")
     config_vocab = Config(dir_output + "vocab.json")
@@ -35,11 +37,11 @@ def main(results):
 
     # chkp.print_tensors_in_checkpoint_file(weights_dir, tensor_name='', all_tensors=True)
 
-    # converter = tf.lite.TFLiteConverter.from_saved_model(saved_path)
-    # converter.target_ops = [
-    #     tf.lite.OpsSet.SELECT_TF_OPS]
-    # tflite_model = converter.convert()
-    # open("converted_model.tflite", "wb").write(tflite_model)
+    converter = tf.lite.TFLiteConverter.from_saved_model(saved_path)
+    converter.target_ops = [
+        tf.lite.OpsSet.SELECT_TF_OPS]
+    tflite_model = converter.convert()
+    open("converted_model.tflite", "wb").write(tflite_model)
 
 
 if __name__ == "__main__":

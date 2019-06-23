@@ -12,7 +12,7 @@
         "dim_embeddings": 80
     },
 
-    "decoding": "beam_search",
+    "decoding": "greedy",
     "beam_size": 5,
     "div_gamma": 1,
     "div_prob": 0,

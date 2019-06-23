@@ -2,8 +2,8 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.python.util import nest
 import tensorflow.contrib.layers as layers
-# from tensorflow.contrib.rnn import GRUCell, LSTMCell
-LSTMCell = tf.lite.experimental.nn.TFLiteLSTMCell
+from tensorflow.contrib.rnn import GRUCell, LSTMCell
+# LSTMCell = tf.lite.experimental.nn.TFLiteLSTMCell
 
 
 from components.dynamic_decode import dynamic_decode
@@ -59,13 +59,14 @@ class Decoder(object):
             attn_cell = AttentionCell(recu_cell, attn_meca, dropout,
                     self._config.attn_cell_config, self._n_tok)
 
-            embeddings = tf.transpose(embeddings, [1, 0, 2])
-            # train_outputs, _ = tf.nn.dynamic_rnn(attn_cell, embeddings,
-            #                                      time_major=True,
-            #                                      initial_state=attn_cell.initial_state())
+            # time as first dimension
+            # embeddings = tf.transpose(embeddings, [1, 0, 2])
+            # train_outputs, _ = tf.lite.experimental.nn.dynamic_rnn(attn_cell, embeddings,
+            #                                                        initial_state=attn_cell.initial_state())
 
-            train_outputs, _ = tf.lite.experimental.nn.dynamic_rnn(attn_cell, embeddings,
-                                                                   initial_state=attn_cell.initial_state())
+            embeddings = tf.unstack(embeddings, axis=1)
+            train_outputs, _ = tf.nn.static_rnn(attn_cell, embeddings,
+                                                initial_state=attn_cell.initial_state())
 
 
         # decoding

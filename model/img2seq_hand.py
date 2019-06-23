@@ -303,7 +303,6 @@ class Img2SeqModel(BaseModel):
 
         return preds_
 
-
     def save_savedmodel(self, dir_model):
         """Reload weights into session
 
@@ -315,10 +314,9 @@ class Img2SeqModel(BaseModel):
         self.logger.info("Saving to saved model...")
         tf.saved_model.simple_save(self.sess,
                                    dir_model,
-                                   inputs={"formula": self.formula, "formula_length": self.formula_length,
-                                           "img": self.img},
+                                   inputs={"img": self.img, "dropout": self.dropout},
                                    # inputs={"formula": self.formula},
-                                   outputs={"pred_train": self.pred_train})
+                                   outputs={"pred_test": self.pred_test.ids})
 
     def load_savedmodel(self, dir_model):
         tf.saved_model.loader.load(self.sess, [tag_constants.SERVING], dir_model)

@@ -315,7 +315,8 @@ class Img2SeqModel(BaseModel):
         self.logger.info("Saving to saved model...")
         tf.saved_model.simple_save(self.sess,
                                    dir_model,
-                                   inputs={"formula": self.formula, "img": self.img},
+                                   inputs={"formula": self.formula, "formula_length": self.formula_length,
+                                           "img": self.img},
                                    # inputs={"formula": self.formula},
                                    outputs={"pred_train": self.pred_train})
 

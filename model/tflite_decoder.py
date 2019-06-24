@@ -150,6 +150,8 @@ def get_embeddings(formula, E, dim, start_token, batch_size):
 def embedding_initializer():
     """Returns initializer for embeddings"""
     def _initializer(shape, dtype, partition_info=None):
+        # RandomUniform op is not supported by tflite.
+        # E = tf.convert_to_tensor(np.random.uniform(-1, 1, shape).astype(np.float32))
         E = tf.random_uniform(shape, minval=-1.0, maxval=1.0, dtype=dtype)
         E = tf.nn.l2_normalize(E, -1)
         return E

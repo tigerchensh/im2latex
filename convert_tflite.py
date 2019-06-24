@@ -20,7 +20,7 @@ def main(results):
 
     t = datetime.datetime.today().strftime('%Y-%m-%d-%H-%M-%S')
     # saved_path = 'saved_' + t
-    saved_path = 'saved' + t
+    saved_path = 'saved'
     saved_path = os.path.join(dir_output, saved_path)
 
     config_data = Config(dir_output + "data.json")

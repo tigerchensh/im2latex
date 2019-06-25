@@ -1,8 +1,12 @@
 import os
+from multiprocessing import BoundedSemaphore
 
+import imgaug.augmenters as iaa
 import numpy as np
+import psutil
 from PIL import Image
-from scipy.misc import imread
+from concurrent.futures import ThreadPoolExecutor
+from tqdm import tqdm
 
 from .text import split_formula, load_formulas
 
@@ -35,7 +39,8 @@ class DataGenerator(object):
 
     def __init__(self, index_file, path_formulas, dir_images, path_matching,
                  form_prepro=lambda s: split_formula(s), iter_mode="data",
-                 img_prepro=lambda x: x, max_iter=None, max_len=None):
+                 use_aug=False,
+                 img_prepro=lambda x: x, max_iter=None, max_len=None, ):
         """Initializes the DataGenerator
 
         Raw images should be under dir_images/raw
@@ -77,6 +82,7 @@ class DataGenerator(object):
         self._formulas = self._load_formulas(path_formulas)
 
         self._set_data_generator()
+        self._use_aug = use_aug
 
     def _load_formulas(self, filename):
         """Loads txt file with formulas in a dict
@@ -181,28 +187,88 @@ class DataGenerator(object):
 
         return self._length
 
+    def resize_and_save_img(self, raw_img, path):
+        img = raw_img.resize((80, 100), Image.BILINEAR)
+        # img = raw_img.resize((80, 100))
+        img.save(os.path.join(self._dir_images, path))
+
     def build(self):
         #  read index file and generate path_matching and formulas files.
+        sometimes = lambda aug: iaa.Sometimes(0.5, aug)
         formulas = []
+        cpt_cnt = psutil.cpu_count()
+        executor = BoundedExecutor(cpt_cnt, cpt_cnt)
+        aug_times = 4
         with open(self._index_file) as f:
-            for l in f:
-                l = l.strip()
-                if not l:
-                    continue
-                img_path, formula = l.split(',')
-                formula = ' '.join(list(formula))
-                # check img path
-                if not os.path.isfile(os.path.join(self._raw_dir_images, img_path)):
-                    continue
+            for line in tqdm(f):
+                def process(l):
+                    l = l.strip()
+                    if not l:
+                        return
+                    img_path, formula = l.split(',')
+                    formula = ' '.join(list(formula))
+                    # check img path
+                    if not os.path.isfile(os.path.join(self._raw_dir_images, img_path)):
+                        return
 
-                raw_img = Image.open(os.path.join(self._raw_dir_images, img_path)).convert('L')
-                raw_img = raw_img.resize((80, 100))
-                # raw_img = raw_img.resize((80, 100), Image.BILINEAR)
-                raw_img.save(os.path.join(self._dir_images, img_path))
+                    raw_img = Image.open(os.path.join(self._raw_dir_images, img_path)).convert('L')
+                    self.resize_and_save_img(raw_img, img_path)
+                    formulas.append((formula, img_path))
 
-                formulas.append((formula, img_path))
+                    if self._use_aug:
+                        seq = iaa.Sequential([
+                            iaa.Invert(p=1),
+                            sometimes(iaa.Affine(rotate=(-25, 25))),
+                            sometimes(iaa.Affine(shear=(-25, 25))),
+                            sometimes(iaa.Affine(scale=(0.5, 1.3))),
+                            sometimes(iaa.ElasticTransformation(alpha=10.0, sigma=5.0)),
+                            iaa.Invert(p=1),
+                        ])
+                        img = np.array(raw_img)
+                        # seq.show_grid(img, cols=1, rows=1)
+
+                        for i in xrange(aug_times):
+                            image_aug = seq.augment_image(img)
+                            image_aug = Image.fromarray(image_aug)
+                            path = 'aug_{}_{}'.format(i, img_path)
+                            self.resize_and_save_img(image_aug, path)
+                            formulas.append((formula, path))
+
+                executor.submit(process, line)
+
         with open(self._path_formulas, 'w') as formula_file, open(self._path_matching, 'w') as matching_file:
             for idx, (formula, img_path) in enumerate(formulas):
                 self._formulas[idx] = formula
                 formula_file.write('{}\n'.format(formula))
                 matching_file.write('{} {}\n'.format(img_path, idx))
+
+
+class BoundedExecutor:
+    """BoundedExecutor behaves as a ThreadPoolExecutor which will block on
+    calls to submit() once the limit given as "bound" work items are queued for
+    execution.
+    :param bound: Integer - the maximum number of items in the work queue
+    :param max_workers: Integer - the size of the thread pool
+    """
+
+    def __init__(self, bound, max_workers):
+        self.executor = ThreadPoolExecutor(max_workers=max_workers)
+        self.semaphore = BoundedSemaphore(bound + max_workers)
+
+    """See concurrent.futures.Executor#submit"""
+
+    def submit(self, fn, *args, **kwargs):
+        self.semaphore.acquire()
+        try:
+            future = self.executor.submit(fn, *args, **kwargs)
+        except:
+            self.semaphore.release()
+            raise
+        else:
+            future.add_done_callback(lambda x: self.semaphore.release())
+            return future
+
+    """See concurrent.futures.Executor#shutdown"""
+
+    def shutdown(self, wait=True):
+        self.executor.shutdown(wait)

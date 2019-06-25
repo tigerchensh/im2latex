@@ -7,6 +7,8 @@ from model.utils.image import greyscale
 from model.utils.text import Vocab
 
 
+# This doesn't work because "selected ops" are required by tflite.
+
 def truncate_end(list_of_ids, id_end):
     """Removes the end of the list starting from the first id_end token"""
     list_trunc = []

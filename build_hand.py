@@ -18,7 +18,7 @@ def main(data, vocab):
         index_file=data_config.index_train,
         path_formulas=data_config.path_formulas_train,
         dir_images=data_config.dir_images_train,
-        path_matching=data_config.path_matching_train)
+        path_matching=data_config.path_matching_train, use_aug=True)
     test_set = DataGenerator(
         index_file=data_config.index_test,
         path_formulas=data_config.path_formulas_test,
@@ -32,7 +32,7 @@ def main(data, vocab):
 
     # produce images and matching files
     # train_set.build(buckets=None, n_threads=1)
-    train_set.build()
+    # train_set.build()
     test_set.build()
     val_set.build()
     # train_set.build(buckets=data_config.buckets)

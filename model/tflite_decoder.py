@@ -1,16 +1,11 @@
-import numpy as np
 import tensorflow as tf
-from tensorflow.python.util import nest
-import tensorflow.contrib.layers as layers
-from tensorflow.contrib.rnn import GRUCell, LSTMCell
-# LSTMCell = tf.lite.experimental.nn.TFLiteLSTMCell
+from tensorflow.contrib.rnn import LSTMCell
 
-
-from components.dynamic_decode import dynamic_decode
-from components.attention_mechanism import AttentionMechanism
 from components.attention_cell import AttentionCell
-from components.greedy_decoder_cell import GreedyDecoderCell
-from components.beam_search_decoder_cell import BeamSearchDecoderCell
+from components.attention_mechanism import AttentionMechanism
+
+
+# LSTMCell = tf.lite.experimental.nn.TFLiteLSTMCell
 
 
 class Decoder(object):

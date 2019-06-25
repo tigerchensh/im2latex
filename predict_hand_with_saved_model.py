@@ -46,6 +46,7 @@ def interactive_shell(sess):
 
         img = greyscale(img)
         ids_eval, = sess.run(['transpose_1:0'], feed_dict={'img:0': [img], 'dropout:0': 1})
+        # ids_eval, = sess.run(['transpose_1:0'], feed_dict={'img:0': [img]})
         p = truncate_end(ids_eval[0], vocab.id_end)
         p = " ".join([vocab.id_to_tok[idx] for idx in p])
 
@@ -61,7 +62,7 @@ if __name__ == "__main__":
     vocab = Vocab(config_vocab)
 
     with tf.Session(graph=tf.Graph()) as sess:
-        tf.saved_model.loader.load(sess, ["serve"], "results/hand/saved2019-06-23-16-24-51")
+        tf.saved_model.loader.load(sess, ["serve"], "results/hand/saved")
         graph = tf.get_default_graph()
 
         # sess.run('myOutput:0', feed_dict={'myInput:0': None})

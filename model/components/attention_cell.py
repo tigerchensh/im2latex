@@ -73,6 +73,7 @@ class AttentionCell(RNNCell):
             # compute new h
             x                     = tf.concat([embedding, o], axis=-1)
             new_h, new_cell_state = self._cell.__call__(x, prev_cell_state)
+            # TODO(gaoxiao): deal with dropout for tflite (dropout has RandomUniform)
             new_h = tf.nn.dropout(new_h, self._dropout)
 
             # compute attention

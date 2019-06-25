@@ -60,7 +60,8 @@ if __name__ == "__main__":
     config_model = Config(dir_output + "model.json")
     vocab = Vocab(config_vocab)
 
-    interpreter = tf.contrib.lite.Interpreter(model_path="converted_model.tflite")
+    # Load TFLite model and allocate tensors.
+    interpreter = tf.lite.Interpreter(model_path="converted_model.tflite")
     interpreter.allocate_tensors()
 
     # Get input and output tensors.

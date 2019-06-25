@@ -1,3 +1,36 @@
+# Hand recognition steps:
+
+## data&train
+* download data
+```bash
+cd tools; python download_data.py
+```
+
+* build hand data
+```bash
+make build-hand
+``` 
+
+* train hand data
+```bash
+make train-hand
+``` 
+
+* convert to tflite
+```bash
+python convert_tflite.py
+```
+This will generate model file: converted_model.tflite 
+
+## android
+
+* build android aar:
+https://www.tensorflow.org/lite/guide/ops_select#android_aar
+
+### example
+https://github.com/gaoxiao/tflite-mnist-android
+
+
 # Im2Latex
 
 Seq2Seq model with Attention + Beam Search for Image to LaTeX, similar to [Show, Attend and Tell](https://arxiv.org/abs/1502.03044) and [Harvard's paper and dataset](http://lstm.seas.harvard.edu/latex/).

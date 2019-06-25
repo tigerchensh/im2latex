@@ -196,7 +196,8 @@ class DataGenerator(object):
                     continue
 
                 raw_img = Image.open(os.path.join(self._raw_dir_images, img_path)).convert('L')
-                raw_img = raw_img.resize((80, 100), Image.BILINEAR)
+                raw_img = raw_img.resize((80, 100))
+                # raw_img = raw_img.resize((80, 100), Image.BILINEAR)
                 raw_img.save(os.path.join(self._dir_images, img_path))
 
                 formulas.append((formula, img_path))

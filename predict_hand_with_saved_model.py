@@ -35,7 +35,8 @@ def interactive_shell(sess):
 
         if img_path[-3:] == "png":
             img = Image.open(img_path)
-            img = img.resize((80, 100), Image.BILINEAR)
+            img = img.resize((80, 100))
+            # img = img.resize((80, 100), Image.BILINEAR)
             img.show()
             img = np.array(img)
 
@@ -45,8 +46,8 @@ def interactive_shell(sess):
             # img = imread(tmp_img)
 
         img = greyscale(img)
-        ids_eval, = sess.run(['transpose_1:0'], feed_dict={'img:0': [img], 'dropout:0': 1})
-        # ids_eval, = sess.run(['transpose_1:0'], feed_dict={'img:0': [img]})
+        ids_eval, = sess.run(['transpose_1:0'], feed_dict={'img:0': [img]})
+        # ids_eval, = sess.run(['transpose_1:0'], feed_dict={'img:0': [img], 'dropout:0': 1})
         p = truncate_end(ids_eval[0], vocab.id_end)
         p = " ".join([vocab.id_to_tok[idx] for idx in p])
 

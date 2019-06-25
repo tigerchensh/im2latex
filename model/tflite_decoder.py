@@ -72,7 +72,7 @@ class Decoder(object):
                     tiles=self._tiles)
             recu_cell = LSTMCell(self._config.attn_cell_config["num_units"],
                     reuse=True)
-            attn_cell = AttentionCell(recu_cell, attn_meca, dropout,
+            attn_cell = AttentionCell(recu_cell, attn_meca, 1,
                     self._config.attn_cell_config, self._n_tok)
 
 

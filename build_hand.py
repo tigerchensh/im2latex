@@ -32,7 +32,7 @@ def main(data, vocab):
 
     # produce images and matching files
     # train_set.build(buckets=None, n_threads=1)
-    # train_set.build()
+    train_set.build()
     test_set.build()
     val_set.build()
     # train_set.build(buckets=data_config.buckets)

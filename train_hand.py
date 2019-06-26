@@ -1,3 +1,5 @@
+import os
+
 import click
 
 from model.img2seq_hand import Img2SeqModel
@@ -50,7 +52,6 @@ def main(data, vocab, training, model, output):
     print len(train_set)
     print config.batch_size
     print n_batches_epoch
-    print config
 
     lr_schedule = LRSchedule(lr_init=config.lr_init,
                              start_decay=config.start_decay * n_batches_epoch,
@@ -59,9 +60,14 @@ def main(data, vocab, training, model, output):
                              lr_warm=config.lr_warm,
                              lr_min=config.lr_min)
 
+    transfer_model = config.transfer_model
+
     # Build model and train
     model = Img2SeqModel(config, dir_output, vocab)
     model.build_train(config)
+    if transfer_model and os.path.isdir(transfer_model):
+        model.restore_session(transfer_model)
+
     model.train(config, train_set, val_set, lr_schedule)
 
 

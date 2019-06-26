@@ -13,5 +13,7 @@
     "start_decay"  : 6,
     "end_decay"    : 13,
     "lr_warm"      : 1e-4,
-    "end_warm"     : 10
+    "end_warm"     : 10,
+
+    "transfer_model"   : "/home/xiao/code/im2latex/results/hand/model.weights.v1/"
 }

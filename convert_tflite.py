@@ -16,7 +16,7 @@ from model.utils.text import Vocab
 def main(results):
     # restore config and model
     dir_output = results
-    weights_dir = os.path.join(dir_output, 'model.weights/')
+    weights_dir = os.path.join(dir_output, 'model.weights.v1/')
 
     t = datetime.datetime.today().strftime('%Y-%m-%d-%H-%M-%S')
     # saved_path = 'saved_' + t

@@ -35,8 +35,8 @@ def interactive_shell(sess):
 
         if img_path[-3:] == "png":
             img = Image.open(img_path)
-            img = img.resize((80, 100))
-            # img = img.resize((80, 100), Image.BILINEAR)
+            # img = img.resize((80, 100))
+            img = img.resize((80, 100), Image.BILINEAR)
             img.show()
             img = np.array(img)
 

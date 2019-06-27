@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# 这里的beam search没有使用到pretrain的knowledge，而是把beam放到模型立马一起训练。
+# 假设beam size是5, 那么lstm的state和output都会是原来的5倍，这些参数会倍用来训练beam search本身。
+
+
 import tensorflow as tf
 import collections
 from tensorflow.python.util import nest

@@ -15,5 +15,5 @@
     "lr_warm"      : 1e-4,
     "end_warm"     : 10,
 
-    "transfer_model"   : "/home/xiao/code/im2latex/results/hand/model.weights.v1/"
+    "transfer_model"   : null
 }

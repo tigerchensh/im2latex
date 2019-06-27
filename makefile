@@ -55,7 +55,7 @@ build-hand:
 	python build_hand.py --data=configs/data_hand.json --vocab=configs/vocab_hand.json
 
 train-hand:
-	python train_hand.py --data=configs/data_hand.json --vocab=configs/vocab_hand.json --training=configs/training_hand.json --model=configs/model.json --output=results/hand/
+	python train_hand.py --data=configs/data_hand.json --vocab=configs/vocab_hand.json --training=configs/training_hand.json --model=configs/model.json --output=results/hand_small_rnn/
 
 eval-hand:
 	python evaluate_hand_txt.py --results=results/hand/

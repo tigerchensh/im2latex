@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import tensorflow as tf
 from PIL import Image
@@ -57,13 +59,13 @@ def interactive_shell(sess):
 if __name__ == "__main__":
     # restore config and model
     # dir_output = "results/small/"
-    dir_output = "results/hand/"
+    dir_output = "results/hand_small_rnn_cnn/"
     config_vocab = Config(dir_output + "vocab.json")
     config_model = Config(dir_output + "model.json")
     vocab = Vocab(config_vocab)
 
     with tf.Session(graph=tf.Graph()) as sess:
-        tf.saved_model.loader.load(sess, ["serve"], "results/hand/saved")
+        tf.saved_model.loader.load(sess, ["serve"], os.path.join(dir_output, 'saved'))
         graph = tf.get_default_graph()
 
         # sess.run('myOutput:0', feed_dict={'myInput:0': None})

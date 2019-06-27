@@ -198,7 +198,7 @@ class DataGenerator(object):
         formulas = []
         cpt_cnt = psutil.cpu_count()
         executor = BoundedExecutor(cpt_cnt, cpt_cnt)
-        aug_times = 4
+        aug_times = 20
         with open(self._index_file) as f:
             for line in tqdm(f):
                 def process(l):

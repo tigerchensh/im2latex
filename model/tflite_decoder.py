@@ -63,6 +63,8 @@ class Decoder(object):
             embeddings = tf.unstack(embeddings, axis=1)
             train_outputs, _ = tf.nn.static_rnn(attn_cell, embeddings,
                                                 initial_state=attn_cell.initial_state())
+            # need to transpose here because 'tf lite lstm' requires 'time_major=True'
+            train_outputs = tf.transpose(train_outputs, [1, 0, 2])
 
 
         # decoding
@@ -110,10 +112,9 @@ class Decoder(object):
                 embeddings = tf.nn.embedding_lookup(E, new_ids)
                 # embeddings = tf.squeeze(embeddings, 0)
                 test_outputs.append(new_ids)
+            # need to transpose here because 'tf lite lstm' requires 'time_major=True'
+            test_outputs = tf.transpose(test_outputs, [1, 0])
 
-        # need to transpose here because 'tf lite lstm' requires 'time_major=True'
-        train_outputs = tf.transpose(train_outputs, [1, 0, 2])
-        test_outputs = tf.transpose(test_outputs, [1, 0])
         return train_outputs, test_outputs
 
 

@@ -4,7 +4,7 @@ import tensorflow as tf
 from tensorflow.python.saved_model import tag_constants
 
 from .base import BaseModel
-from .tflite_decoder import Decoder
+from .hand_decoder import Decoder
 from .encoder import Encoder
 from .evaluation.text import score_files, write_answers, truncate_end
 from .utils.general import Config, Progbar, minibatches
@@ -229,7 +229,7 @@ class Img2SeqModel(BaseModel):
             fd = self._get_feed_dict(img, training=False, formula=formula,
                                      dropout=1)
             ce_words_eval, n_words_eval, ids_eval = self.sess.run(
-                [self.ce_words, self.n_words, self.pred_test],
+                [self.ce_words, self.n_words, self.pred_test.ids],
                 feed_dict=fd)
 
             # TODO(guillaume): move this logic into tf graph
@@ -278,7 +278,7 @@ class Img2SeqModel(BaseModel):
             hyps = [[] for i in range(self._config.beam_size)]
 
         fd = self._get_feed_dict(images, training=False, dropout=1)
-        ids_eval, = self.sess.run([self.pred_test], feed_dict=fd)
+        ids_eval, = self.sess.run([self.pred_test.ids], feed_dict=fd)
 
         if self._config.decoding == "greedy":
             ids_eval = np.expand_dims(ids_eval, axis=1)

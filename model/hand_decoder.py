@@ -8,6 +8,7 @@ from components.attention_mechanism import AttentionMechanism
 # LSTMCell = tf.lite.experimental.nn.TFLiteLSTMCell
 from model.components.beam_search_decoder_cell import BeamSearchDecoderCell
 from model.components.dynamic_decode import dynamic_decode
+from model.components.greedy_decoder_cell import GreedyDecoderCell
 
 
 class Decoder(object):
@@ -76,42 +77,18 @@ class Decoder(object):
                     tiles=self._tiles)
             recu_cell = LSTMCell(self._config.attn_cell_config["num_units"],
                     reuse=True)
-            attn_cell = AttentionCell(recu_cell, attn_meca, 1,
+            attn_cell = AttentionCell(recu_cell, attn_meca, dropout,
                     self._config.attn_cell_config, self._n_tok)
+            if self._config.decoding == "greedy":
+                decoder_cell = GreedyDecoderCell(E, attn_cell, batch_size,
+                        start_token, self._id_end)
+            elif self._config.decoding == "beam_search":
+                decoder_cell = BeamSearchDecoderCell(E, attn_cell, batch_size,
+                        start_token, self._id_end, self._config.beam_size,
+                        self._config.div_gamma, self._config.div_prob)
 
-
-            decoder_cell = BeamSearchDecoderCell(E, attn_cell, batch_size,
-                    start_token, self._id_end, self._config.beam_size,
-                    self._config.div_gamma, self._config.div_prob)
             test_outputs, _ = dynamic_decode(decoder_cell,
                     self._config.max_length_formula+1)
-
-            # (B, 80)
-            init_embeddings = tf.tile(tf.expand_dims(start_token, 0),
-                                      multiples=[batch_size, 1])
-            # (T, B, 80)
-            init_embeddings = tf.tile(tf.expand_dims(init_embeddings, 0),
-                                      multiples=[self._config.max_length_formula + 1, 1, 1])
-            init_embeddings = tf.unstack(init_embeddings, axis=0)
-            test_outputs, _ = tf.nn.static_rnn(attn_cell, init_embeddings,
-                                               initial_state=attn_cell.initial_state())
-
-            test_outputs = tf.cast(tf.argmax(test_outputs, axis=-1), tf.int32)
-
-            # test_outputs = []
-            # embeddings = tf.tile(tf.expand_dims(start_token, 0),
-            #                      multiples=[batch_size, 1])
-            # state = attn_cell.initial_state()
-            # for _ in range(self._config.max_length_formula + 1):
-            #     logits, state = tf.nn.static_rnn(attn_cell, [embeddings],
-            #                                      initial_state=state)
-            #     new_ids = tf.cast(tf.argmax(logits, axis=-1), tf.int32)
-            #     new_ids = tf.squeeze(new_ids, 0)
-            #     embeddings = tf.nn.embedding_lookup(E, new_ids)
-            #     # embeddings = tf.squeeze(embeddings, 0)
-            #     test_outputs.append(new_ids)
-            # # need to transpose here because 'tf lite lstm' requires 'time_major=True'
-            # test_outputs = tf.transpose(test_outputs, [1, 0])
 
         return train_outputs, test_outputs
 

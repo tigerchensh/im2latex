@@ -2,9 +2,9 @@ import datetime
 import os
 
 import click
-
+import numpy as np
 import tensorflow as tf
-from tensorflow.python.tools import inspect_checkpoint as chkp
+from PIL import Image
 
 from model.img2seq_hand import Img2SeqModel
 from model.utils.general import Config
@@ -16,7 +16,7 @@ from model.utils.text import Vocab
 def main(results):
     # restore config and model
     dir_output = results
-    weights_dir = os.path.join(dir_output, 'model.weights.v1/')
+    weights_dir = os.path.join(dir_output, 'model.weights/')
 
     t = datetime.datetime.today().strftime('%Y-%m-%d-%H-%M-%S')
     # saved_path = 'saved_' + t
@@ -37,10 +37,36 @@ def main(results):
 
     # chkp.print_tensors_in_checkpoint_file(weights_dir, tensor_name='', all_tensors=True)
 
+    SAMPLE_DIR = 'tools/data/hand/raw'
+
+    def representative_dataset_gen():
+        num_calibration_steps = 10
+
+        if not os.path.isdir(SAMPLE_DIR):
+            print 'Failed to read representative_dataset'
+            return
+
+        for f in os.listdir(SAMPLE_DIR):
+            img_path = os.path.join(SAMPLE_DIR, f)
+            img = Image.open(img_path)
+            img = img.resize((80, 100), Image.BILINEAR)
+            img.show()
+            img = np.array(img)
+            yield [img]
+
+            num_calibration_steps -= 1
+            if num_calibration_steps == 0:
+                break
+
     converter = tf.lite.TFLiteConverter.from_saved_model(saved_path)
     converter.target_ops = [
         # tf.lite.OpsSet.TFLITE_BUILTINS,
         tf.lite.OpsSet.SELECT_TF_OPS]
+
+    # Following has "Segmentation fault"
+    # converter.optimizations = [tf.lite.Optimize.DEFAULT]
+    # converter.representative_dataset = representative_dataset_gen
+
     tflite_model = converter.convert()
     open("converted_model.tflite", "wb").write(tflite_model)
 

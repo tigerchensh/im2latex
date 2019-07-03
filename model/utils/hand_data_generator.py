@@ -222,6 +222,9 @@ class DataGenerator(object):
                             sometimes(iaa.Affine(shear=(-25, 25))),
                             sometimes(iaa.Affine(scale=(0.5, 1.3))),
                             sometimes(iaa.ElasticTransformation(alpha=10.0, sigma=5.0)),
+                            sometimes(
+                                iaa.Affine(translate_percent={"x": (-0.2, 0.2), "y": (-0.2, 0.2)})),
+                            sometimes(iaa.AdditiveGaussianNoise(scale=0.1 * 255)),
                             iaa.Invert(p=1),
                         ])
                         img = np.array(raw_img)

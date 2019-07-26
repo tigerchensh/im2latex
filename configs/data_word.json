@@ -1,0 +1,29 @@
+{
+    "export_name": "data.json",
+
+    "dir_images_train": "/home/littlelight/im2latex/tools/data/hand",
+    "dir_images_test" : "/home/littlelight/im2latex/tools/data/hand",
+    "dir_images_val"  : "/home/littlelight/im2latex/tools/data/hand",
+
+    "index_train"  : "index_word.txt",
+    "index_test"  : "index_word _test.txt",
+    "index_val"  : "index_word _eval.txt",
+
+    "path_matching_train": "data/word.train.matching.txt",
+    "path_matching_test"  : "data/word.test.matching.txt",
+    "path_matching_val" : "data/word.val.matching.txt",
+
+    "path_formulas_train": "data/word.train.formulas.norm.txt",
+    "path_formulas_test" : "data/word.test.formulas.norm.txt",
+    "path_formulas_val"  : "data/word.val.formulas.norm.txt",
+
+
+    "bucket_train": true,
+    "bucket_val": true,
+    "bucket_test": true,
+
+    "max_iter"          : null,
+    "max_length_formula": 50,
+
+    "buckets": []
+}
